@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors({
@@ -39,7 +39,7 @@ async function run() {
         // artifacts related APIs
         const artifactsCollection = client.db('historicalArtifacts').collection('artifacts');
 
-        app.get('/artifacts', async(req, res) => {
+        app.get('/artifacts', async (req, res) => {
             const cursor = artifactsCollection.find();
             const result = await cursor.toArray();
             res.send(result);
@@ -48,6 +48,13 @@ async function run() {
         app.get('/featured/artifacts', async (req, res) => {
             const cursor = artifactsCollection.find({}).sort({ likeCount: -1 }).limit(6);
             const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        app.get('/artifacts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await artifactsCollection.findOne(query);
             res.send(result);
         })
 
