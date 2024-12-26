@@ -53,9 +53,21 @@ async function run() {
 
         app.get('/artifacts/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await artifactsCollection.findOne(query);
             res.send(result);
+        });
+
+        // add artifact
+        app.post('/artifacts', async (req, res) => {
+            const newArtifact = req.body;
+            const artifactLikeDefault = {
+                ...newArtifact,
+                likeCount: 0,
+            }
+            // console.log(artifactLikeDefault);
+            const result = await artifactsCollection.insertOne(artifactLikeDefault);
+            res.status(201).send(result);
         })
 
 
