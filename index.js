@@ -77,37 +77,66 @@ async function run() {
             res.status(201).send(result);
         });
 
+
+
         // // like btn functionality
-        // app.put('/artifacts/:id/like', async (req, res) => {
-        //     const { id } = req.params.id;
-        //     const query = {_id: new ObjectId(id)}
-        //     const { action } = req.body;
+        // app.put("/artifacts/:id/like", async (req, res) => {
+        //     const artifactId = req.params.id;
+        //     const { userId } = req.body;
 
-        //     const update = action === 'like' ? { $inc: { likeCount: 1 } } : { $inc: { likeCount: -1 } };
-        //     const result = await artifactsCollection.updateOne(query, update);
+        //     try {
+        //         await client.connect();
+        //         const database = client.db("historical_artifacts");
+        //         const artifactsCollection = database.collection("artifacts");
 
-        //     if (result.modifiedCount > 0) {
-        //         res.status(200).send(result);
-        //     } else {
-        //         res.status(404).send({ message: 'Artifact not found' });
+                
+        //         const artifact = await artifactsCollection.findOne({ _id: new ObjectId(artifactId) });
+
+        //         if (!artifact) {
+        //             return res.status(404).json({ message: "Artifact not found" });
+        //         }
+
+        //         const alreadyLiked = artifact.likedBy.includes(userId);
+
+                
+        //         const update = alreadyLiked
+        //             ? {
+        //                 $inc: { likes: -1 },
+        //                 $pull: { likedBy: userId },
+        //             }
+        //             : {
+        //                 $inc: { likes: 1 },
+        //                 $push: { likedBy: userId },
+        //             };
+
+        //         await artifactsCollection.updateOne({ _id: new ObjectId(artifactId) }, update);
+
+        //         res.status(200).json({
+        //             message: alreadyLiked ? "Like removed" : "Artifact liked",
+        //         });
+        //     } catch (error) {
+        //         res.status(500).json({ message: "An error occurred", error: error.message });
+        //     } finally {
+        //         await client.close();
         //     }
-        // })
+        // });
+
 
 
         // UPDATE
-        app.put('/artifacts/:id', async(req, res) => {
+        app.put('/artifacts/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: new ObjectId(id)}
-            const options = {upsert: true};
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
             const updatedArtifact = req.body;
-            const result = await artifactsCollection.updateOne(filter, {$set: updatedArtifact}, options);
+            const result = await artifactsCollection.updateOne(filter, { $set: updatedArtifact }, options);
             res.send(result)
         })
 
         // DELETE
         app.delete('/artifacts/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)}
+            const query = { _id: new ObjectId(id) }
             const result = await artifactsCollection.deleteOne(query);
             res.send(result);
         });
