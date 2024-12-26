@@ -68,7 +68,23 @@ async function run() {
             // console.log(artifactLikeDefault);
             const result = await artifactsCollection.insertOne(artifactLikeDefault);
             res.status(201).send(result);
-        })
+        });
+
+        // // like btn functionality
+        // app.put('/artifacts/:id/like', async (req, res) => {
+        //     const { id } = req.params.id;
+        //     const query = {_id: new ObjectId(id)}
+        //     const { action } = req.body;
+
+        //     const update = action === 'like' ? { $inc: { likeCount: 1 } } : { $inc: { likeCount: -1 } };
+        //     const result = await artifactsCollection.updateOne(query, update);
+
+        //     if (result.modifiedCount > 0) {
+        //         res.status(200).send(result);
+        //     } else {
+        //         res.status(404).send({ message: 'Artifact not found' });
+        //     }
+        // })
 
 
 
