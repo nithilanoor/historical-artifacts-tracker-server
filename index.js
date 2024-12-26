@@ -40,7 +40,14 @@ async function run() {
         const artifactsCollection = client.db('historicalArtifacts').collection('artifacts');
 
         app.get('/artifacts', async (req, res) => {
-            const cursor = artifactsCollection.find();
+            // 
+            const email = req.query.email;
+            let query = {};
+            if (email) {
+                query = { addedBy: email }
+            }
+
+            const cursor = artifactsCollection.find(query);
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -85,6 +92,10 @@ async function run() {
         //         res.status(404).send({ message: 'Artifact not found' });
         //     }
         // })
+
+
+        // my artifacts
+        app.get('/')
 
 
 
