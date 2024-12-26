@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors({
-    origin: ['http://localhost:5173'],
+    origin: ['https://historical-artifacts-tracker.netlify.app'],
     credentials: true
 }));
 app.use(express.json());
@@ -80,46 +80,24 @@ async function run() {
 
 
         // // like btn functionality
-        // app.put("/artifacts/:id/like", async (req, res) => {
-        //     const artifactId = req.params.id;
-        //     const { userId } = req.body;
+        app.patch('/artifacts/:id/like', async (req, res) => {
+            const { id } = req.params;
 
-        //     try {
-        //         await client.connect();
-        //         const database = client.db("historical_artifacts");
-        //         const artifactsCollection = database.collection("artifacts");
+            try {
+                const result = await artifactsCollection.updateOne(
+                    { _id: new require('mongodb').ObjectId(id) },
+                    { $inc: { likeCount: 1 } }
+                );
 
-                
-        //         const artifact = await artifactsCollection.findOne({ _id: new ObjectId(artifactId) });
-
-        //         if (!artifact) {
-        //             return res.status(404).json({ message: "Artifact not found" });
-        //         }
-
-        //         const alreadyLiked = artifact.likedBy.includes(userId);
-
-                
-        //         const update = alreadyLiked
-        //             ? {
-        //                 $inc: { likes: -1 },
-        //                 $pull: { likedBy: userId },
-        //             }
-        //             : {
-        //                 $inc: { likes: 1 },
-        //                 $push: { likedBy: userId },
-        //             };
-
-        //         await artifactsCollection.updateOne({ _id: new ObjectId(artifactId) }, update);
-
-        //         res.status(200).json({
-        //             message: alreadyLiked ? "Like removed" : "Artifact liked",
-        //         });
-        //     } catch (error) {
-        //         res.status(500).json({ message: "An error occurred", error: error.message });
-        //     } finally {
-        //         await client.close();
-        //     }
-        // });
+                if (result.modifiedCount === 1) {
+                    res.status(200).send({ message: 'Like count updated successfully' });
+                } else {
+                    res.status(404).send({ message: 'Artifact not found' });
+                }
+            } catch (error) {
+                res.status(500).send({ message: 'Error updating like count', error });
+            }
+        });
 
 
 
@@ -131,7 +109,7 @@ async function run() {
             const updatedArtifact = req.body;
             const result = await artifactsCollection.updateOne(filter, { $set: updatedArtifact }, options);
             res.send(result)
-        })
+        });
 
         // DELETE
         app.delete('/artifacts/:id', async (req, res) => {
