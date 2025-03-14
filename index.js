@@ -79,25 +79,65 @@ async function run() {
 
 
 
-        // // like btn functionality
-        app.patch('/artifacts/:id/like', async (req, res) => {
+        // LIKE BUTTON FUNCTIONALITY
+        app.get("/artifacts/:id", async (req, res) => {
             const { id } = req.params;
-
-            try {
-                const result = await artifactsCollection.updateOne(
-                    { _id: new require('mongodb').ObjectId(id) },
-                    { $inc: { likeCount: 1 } }
-                );
-
-                if (result.modifiedCount === 1) {
-                    res.status(200).send({ message: 'Like count updated successfully' });
-                } else {
-                    res.status(404).send({ message: 'Artifact not found' });
-                }
-            } catch (error) {
-                res.status(500).send({ message: 'Error updating like count', error });
+            const artifact = await artifactsCollection.findOne({ _id: new ObjectId(id) });
+          
+            if (!artifact) {
+              return res.status(404).json({ error: "artifact not found" });
             }
+          
+            res.json({
+              likeCount: artifact.likeCount || 0,
+              likedBy: artifact.likedBy || [] 
+            });
+          });
+          
+
+        app.post("/artifacts/:id/like", async (req, res) => {
+            const { id } = req.params;
+            const { userId } = req.body; 
+
+            const artifact = await artifactsCollection.findOne({ _id: new ObjectId(id) });
+
+            if (!artifact) {
+                return res.status(404).json({ error: "artifact not found" });
+            }
+
+            
+            if (artifact.likedBy?.includes(userId)) {
+                return res.status(400).json({ error: "You have already liked this artifact" });
+            }
+
+            
+            await artifactsCollection.updateOne(
+                { _id: new ObjectId(id) },
+                {
+                    $inc: { likeCount: 1 },
+                    $push: { likedBy: userId } 
+                }
+            );
+
+            res.json({ success: true });
         });
+
+
+        app.get("/liked-artifacts/:userId", async (req, res) => {
+            const { userId } = req.params;
+          
+            try {
+              const likedArtifacts = await artifactsCollection.find({ likedBy: userId }).toArray();
+          
+              res.json(likedArtifacts);
+            } catch (error) {
+              console.error("Error fetching liked artifact:", error);
+              res.status(500).json({ error: "Internal Server Error" });
+            }
+          });
+          
+          
+
 
 
 
