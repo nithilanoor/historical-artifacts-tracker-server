@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://historical-artifacts-tracker.netlify.app', 'https://historical-artifacts-server-virid.vercel.app/', 'https://vercel.com/nithilas-projects/historical-artifacts-server/64kJjfnkox5iVFpiAQR763UgyMNj'],
+    origin: ['*','http://localhost:5175', 'https://historical-artifacts-tracker.netlify.app', 'https://historical-artifacts-server-virid.vercel.app', 'https://vercel.com/nithilas-projects/historical-artifacts-server/64kJjfnkox5iVFpiAQR763UgyMNj'],
     credentials: true
 }));
 app.use(express.json());
